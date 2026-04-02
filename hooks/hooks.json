@@ -1,0 +1,9 @@
+{
+  "hooks": [
+    {
+      "event": "SessionStart",
+      "command": "bash hooks/session-start/cyberfit-check.sh",
+      "description": "启动时检查义体维护状态"
+    }
+  ]
+}

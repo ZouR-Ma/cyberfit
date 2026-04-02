@@ -1,0 +1,22 @@
+{
+  "name": "cyberfit",
+  "description": "赛博朋克主题程序员健身插件 — 夜之城义体维护系统。帮助程序员在编码间隙保持身体健康，用赛博朋克世界观包装健身体验。",
+  "version": "1.0.0",
+  "skills": [
+    "skills/cyberfit-break/SKILL.md",
+    "skills/cyberfit-plan/SKILL.md",
+    "skills/cyberfit-log/SKILL.md",
+    "skills/cyberfit-status/SKILL.md",
+    "skills/cyberfit-posture/SKILL.md",
+    "skills/cyberfit-achievements/SKILL.md"
+  ],
+  "commands": [
+    "commands/cyberfit.md",
+    "commands/cyberfit-break.md",
+    "commands/cyberfit-plan.md",
+    "commands/cyberfit-log.md",
+    "commands/cyberfit-status.md",
+    "commands/cyberfit-posture.md"
+  ],
+  "hooks": "hooks/hooks.json"
+}

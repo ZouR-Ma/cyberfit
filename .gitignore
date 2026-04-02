@@ -1,0 +1,15 @@
+# Data
+data/
+!data/.gitkeep
+
+# User data
+.cyberfit/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db

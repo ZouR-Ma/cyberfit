@@ -1,0 +1,15 @@
+{
+  "name": "cyberfit",
+  "version": "1.0.0",
+  "description": "赛博朋克主题程序员健身 Claude Code 插件 — 夜之城义体维护系统",
+  "main": "scripts/cli.py",
+  "keywords": [
+    "claude-code-plugin",
+    "fitness",
+    "cyberpunk",
+    "health",
+    "programmer"
+  ],
+  "author": "CyberFit",
+  "license": "MIT"
+}
