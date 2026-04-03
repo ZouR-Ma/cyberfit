@@ -188,6 +188,52 @@ python3 scripts/cli.py check-session   # 检查你坐了多久了
 
 ---
 
+## 项目结构
+
+```
+cyberfit/
+├── SKILL.md              # AgentSkills 标准入口
+├── CLAUDE.md             # Claude Code 人格指令
+├── README.md
+├── LICENSE
+├── package.json
+├── requirements.txt      # Python 依赖声明
+├── .gitignore
+├── .claude-plugin/       # Claude Code 插件配置
+│   ├── plugin.json
+│   └── marketplace.json
+├── prompts/              # Prompt 模板（AgentSkills 标准）
+│   ├── cyberfit.md
+│   ├── cyberfit-break.md
+│   ├── cyberfit-plan.md
+│   ├── cyberfit-log.md
+│   ├── cyberfit-status.md
+│   └── cyberfit-posture.md
+├── skills/               # 子技能（各含 SKILL.md）
+│   ├── cyberfit-break/
+│   ├── cyberfit-plan/
+│   ├── cyberfit-log/
+│   ├── cyberfit-status/
+│   ├── cyberfit-posture/
+│   └── cyberfit-achievements/
+├── scripts/              # Python CLI 工具
+│   ├── cli.py
+│   ├── core.py
+│   ├── data.py
+│   ├── exercises.py
+│   ├── achievements.py
+│   ├── planner.py
+│   ├── ascii_art.py
+│   └── lore.py
+├── hooks/                # Claude Code hooks
+│   ├── hooks.json
+│   └── session-start/
+└── data/
+    └── .gitkeep
+```
+
+---
+
 ## 数据存储
 
 用户数据保存在 `~/.cyberfit/` 目录下。这是**你自己的**数据，跟谁都没关系。
@@ -229,6 +275,6 @@ python3 scripts/cli.py check-session   # 检查你坐了多久了
 
 **这些破事没有毁掉你。站起来。**
 
-MIT License
+MIT License © [ZouR-Ma](https://github.com/ZouR-Ma)
 
 </div>
