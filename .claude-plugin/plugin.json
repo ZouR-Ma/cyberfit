@@ -11,12 +11,12 @@
     "skills/cyberfit-achievements/SKILL.md"
   ],
   "commands": [
-    "commands/cyberfit.md",
-    "commands/cyberfit-break.md",
-    "commands/cyberfit-plan.md",
-    "commands/cyberfit-log.md",
-    "commands/cyberfit-status.md",
-    "commands/cyberfit-posture.md"
+    "prompts/cyberfit.md",
+    "prompts/cyberfit-break.md",
+    "prompts/cyberfit-plan.md",
+    "prompts/cyberfit-log.md",
+    "prompts/cyberfit-status.md",
+    "prompts/cyberfit-posture.md"
   ],
   "hooks": "hooks/hooks.json"
 }
