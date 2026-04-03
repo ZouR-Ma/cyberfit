@@ -229,6 +229,6 @@ python3 scripts/cli.py check-session   # 检查你坐了多久了
 
 **这些破事没有毁掉你。站起来。**
 
-MIT License
+MIT License © [ZouR-Ma](https://github.com/ZouR-Ma)
 
 </div>
