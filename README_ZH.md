@@ -89,15 +89,6 @@ mkdir -p .claude/skills
 git clone git@github.com:ZouR-Ma/cyberfit.git .claude/skills/cyberfit
 ```
 
-### 初始化
-
-```bash
-cd cyberfit
-python3 scripts/cli.py init
-```
-
-看到那个 ASCII 大横幅了吗？恭喜你，义体维护系统已上线。你的身体终于有人管了。
-
 ---
 
 ## 使用

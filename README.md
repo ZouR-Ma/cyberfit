@@ -91,15 +91,6 @@ mkdir -p .claude/skills
 git clone git@github.com:ZouR-Ma/cyberfit.git .claude/skills/cyberfit
 ```
 
-### Initialize
-
-```bash
-cd cyberfit
-python3 scripts/cli.py init
-```
-
-If you see the large ASCII banner, the maintenance system is online.
-
 ---
 
 ## Usage
