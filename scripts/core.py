@@ -2,21 +2,26 @@
 CyberFit 核心引擎：计时、状态管理
 """
 
-from datetime import datetime, timedelta
-from . import data, exercises, achievements, lore
+from datetime import datetime
+from . import data, exercises, achievements, lore, i18n
 
 
 def init_user():
     """初始化用户档案"""
     is_new = data.init_profile()
+    profile = data.load_profile()
+    if profile:
+        profile["title"] = achievements.get_title_for_level(profile.get("level", 1))
+        data.save_profile(profile)
+
     if is_new:
         return {
             "status": "new",
-            "message": "义体维护系统初始化完成。欢迎来到夜之城，佣兵。"
+            "message": i18n.t("core.init_new"),
         }
     return {
         "status": "exists",
-        "message": "义体维护系统已在线。操作员档案完整。"
+        "message": i18n.t("core.init_exists"),
     }
 
 
@@ -24,7 +29,7 @@ def get_status():
     """获取当前状态"""
     profile = data.load_profile()
     if not profile:
-        return {"status": "offline", "message": lore.STATUS_DESCRIPTIONS["offline"]}
+        return {"status": "offline", "message": lore.get_status_description("offline")}
 
     logs = data.load_logs()
     today_logs = data.get_today_logs()
@@ -41,10 +46,15 @@ def get_status():
     else:
         status = "good"
 
+    level = profile.get("level", 1)
+    title = achievements.get_title_for_level(level)
+    profile_display = dict(profile)
+    profile_display["title"] = title
+
     return {
         "status": status,
-        "description": lore.STATUS_DESCRIPTIONS[status],
-        "profile": profile,
+        "description": lore.get_status_description(status),
+        "profile": profile_display,
         "today_count": len(today_logs),
         "streak": streak,
         "total_exercises": len(logs),
@@ -59,7 +69,7 @@ def check_session():
     if not profile:
         return {
             "needs_break": False,
-            "message": "义体系统未初始化。运行 init 命令开始。",
+            "message": i18n.t("core.not_initialized"),
             "initialized": False
         }
 
@@ -76,7 +86,7 @@ def check_session():
         return {
             "needs_break": True,
             "message": lore.random_break_reminder(),
-            "reason": "今日尚未进行义体维护",
+            "reason": i18n.t("core.today_no_maintenance"),
             "initialized": True
         }
 
@@ -88,14 +98,14 @@ def check_session():
             return {
                 "needs_break": True,
                 "message": lore.random_break_reminder(),
-                "reason": f"距上次维护已过 {int(minutes_since)} 分钟",
+                "reason": i18n.t("core.minutes_since_maintenance", minutes=int(minutes_since)),
                 "minutes_since": int(minutes_since),
                 "initialized": True
             }
 
     return {
         "needs_break": False,
-        "message": "系统状态正常。继续编码。",
+        "message": i18n.t("core.system_normal"),
         "today_count": len(today_logs),
         "initialized": True
     }
@@ -105,11 +115,11 @@ def log_exercise(exercise_query):
     """记录一次训练"""
     profile = data.load_profile()
     if not profile:
-        return {"error": "系统未初始化。请先运行 init。"}
+        return {"error": i18n.t("core.not_initialized")}
 
     exercise = exercises.find_exercise(exercise_query)
     if not exercise:
-        return {"error": f"未找到运动: {exercise_query}。使用 break-suggest 查看可用运动。"}
+        return {"error": i18n.t("core.exercise_not_found", query=exercise_query)}
 
     # 计算经验值
     xp = exercise["difficulty"] * 10 + 5
@@ -170,15 +180,26 @@ def get_achievements_display():
     """获取成就展示数据"""
     profile = data.load_profile()
     if not profile:
-        return {"error": "系统未初始化。"}
+        return {"error": i18n.t("core.achievements_not_initialized")}
 
     unlocked = data.load_achievements()
     all_defs = achievements.get_all_achievement_defs()
     unlocked_ids = {a["id"] for a in unlocked}
+    defs_by_id = {a["id"]: a for a in all_defs}
+
+    localized_unlocked = []
+    for item in unlocked:
+        definition = defs_by_id.get(item["id"], {})
+        localized_unlocked.append({
+            **item,
+            "name": definition.get("name", item.get("name", "")),
+            "description": definition.get("description", item.get("description", "")),
+            "xp": definition.get("xp", item.get("xp", 0)),
+        })
 
     return {
-        "unlocked": unlocked,
+        "unlocked": localized_unlocked,
         "locked": [a for a in all_defs if a["id"] not in unlocked_ids],
         "total": len(all_defs),
-        "unlocked_count": len(unlocked)
+        "unlocked_count": len(localized_unlocked)
     }

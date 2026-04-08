@@ -20,16 +20,16 @@ def generate_plan(level=None, focus_areas=None, count=5):
         level = 1
 
     if profile and focus_areas is None:
-        focus_areas = profile.get("preferences", {}).get("focus_areas", list(exercises.CATEGORIES.keys()))
+        focus_areas = profile.get("preferences", {}).get("focus_areas", list(exercises.get_categories().keys()))
     if focus_areas is None:
-        focus_areas = list(exercises.CATEGORIES.keys())
+        focus_areas = list(exercises.get_categories().keys())
 
     # 根据等级确定最大难度
     max_difficulty = min(level, 3)
 
     # 收集可用运动
     available = []
-    for ex in exercises.EXERCISES:
+    for ex in exercises.get_exercises():
         if ex["difficulty"] <= max_difficulty and ex["category"] in focus_areas:
             available.append(ex)
 

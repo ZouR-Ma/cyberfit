@@ -6,12 +6,15 @@ CyberFit CLI 入口
 
 import sys
 import os
-import json
 
 # 将 scripts 的父目录加入 path，以支持包导入
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from scripts import core, data, planner, exercises, achievements, ascii_art, lore
+from scripts import core, data, planner, achievements, ascii_art, lore, i18n
+
+
+def _print_error(message):
+    print(f"❌ {message}")
 
 
 def cmd_init():
@@ -20,11 +23,12 @@ def cmd_init():
     print(ascii_art.banner())
     print(result["message"])
     if result["status"] == "new":
-        print("\n已创建用户档案于 ~/.cyberfit/")
-        print("你的代号: V")
-        print("义体等级: LV.1 — 流浪者")
-        print("\n使用 'status' 查看仪表盘")
-        print("使用 'break-suggest' 获取第一个维护指令")
+        title = achievements.get_title_for_level(1)
+        print(f"\n{i18n.t('cli.profile_created')}")
+        print(i18n.t("cli.codename"))
+        print(i18n.t("cli.level_default", title=title))
+        print(f"\n{i18n.t('cli.hint_status')}")
+        print(i18n.t("cli.hint_break"))
 
 
 def cmd_status():
@@ -34,13 +38,15 @@ def cmd_status():
         print(result["message"])
         return
 
-    print(ascii_art.dashboard(
-        result["profile"],
-        result["today_count"],
-        result["streak"],
-        result["achievements_count"]
-    ))
-    print(f"\n  状态: {result['description']}")
+    print(
+        ascii_art.dashboard(
+            result["profile"],
+            result["today_count"],
+            result["streak"],
+            result["achievements_count"],
+        )
+    )
+    print(f"\n  {i18n.t('cli.status_label')}: {result['description']}")
     print(f"\n  📡 {result['quote']}")
 
 
@@ -56,32 +62,32 @@ def cmd_check_session():
         print(ascii_art.break_banner())
         print(f"\n{result['message']}")
         if result.get("reason"):
-            print(f"\n原因: {result['reason']}")
-        print("\n输入 /cyberfit-break 获取维护指令")
+            print(f"\n{i18n.t('cli.reason_label')}: {result['reason']}")
+        print(f"\n{i18n.t('cli.break_hint')}")
     else:
         print(ascii_art.mini_banner())
         print(f"\n{result['message']}")
         if result.get("today_count"):
-            print(f"今日已完成 {result['today_count']} 次维护。")
+            print(i18n.t("cli.today_completed", count=result["today_count"]))
 
 
 def cmd_log(exercise_query):
     """记录训练"""
     result = core.log_exercise(exercise_query)
     if result.get("error"):
-        print(f"❌ {result['error']}")
+        _print_error(result["error"])
         return
 
     ex = result["exercise"]
-    print(f"\n✅ 训练记录已保存！")
-    print(f"\n  动作: {ex['cyber_name']} ({ex['real_name']})")
-    print(f"  经验值: +{result['xp_earned']} XP")
-    print(f"  总经验: {result['total_xp']} XP")
-    print(f"  等级: LV.{result['level']} — {result['title']}")
-    print(f"  连续天数: {result['streak']} 天")
+    print(f"\n✅ {i18n.t('cli.log_saved')}")
+    print(f"\n  {i18n.t('cli.action_label')}: {ex['cyber_name']} ({ex['real_name']})")
+    print(f"  {i18n.t('cli.xp_earned')}: +{result['xp_earned']} XP")
+    print(f"  {i18n.t('cli.total_xp')}: {result['total_xp']} XP")
+    print(f"  {i18n.t('cli.level')}: LV.{result['level']} - {result['title']}")
+    print(f"  {i18n.t('cli.streak_days')}: {result['streak']} {i18n.t('cli.days_suffix')}")
 
     if result.get("level_up"):
-        print(f"\n🎉 等级提升! 你现在是 LV.{result['level']} — {result['title']}!")
+        print(f"\n🎉 {i18n.t('cli.level_up', level=result['level'], title=result['title'])}")
 
     print(f"\n  {result['completion_message']}")
 
@@ -94,43 +100,46 @@ def cmd_plan(level_arg=None):
     """生成健身计划"""
     profile = data.load_profile()
     if not profile:
-        print("❌ 系统未初始化。请先运行 init。")
+        _print_error(i18n.t("core.not_initialized"))
         return
 
     level = int(level_arg) if level_arg else profile.get("level", 1)
-    title = profile.get("title", "流浪者")
+    title = achievements.get_title_for_level(level)
 
     plan = planner.generate_plan(level=level)
     print(f"\n{lore.random_exercise_intro()}")
     print(ascii_art.plan_display(plan, level, title))
 
     total_time = sum(e["duration_seconds"] for e in plan)
-    print(f"\n  预计总时长: {total_time // 60} 分 {total_time % 60} 秒")
-    print(f"\n  完成后使用 'log <运动ID>' 记录训练")
-    print(f"  例如: python3 scripts/cli.py log {plan[0]['id']}")
+    print(
+        f"\n  {i18n.t('cli.plan_total_time', minutes=total_time // 60, seconds=total_time % 60)}"
+    )
+    print(f"\n  {i18n.t('cli.plan_log_hint')}")
+    if plan:
+        print(i18n.t("cli.plan_log_example", exercise_id=plan[0]["id"]))
 
 
 def cmd_achievements():
     """查看成就"""
     result = core.get_achievements_display()
     if result.get("error"):
-        print(f"❌ {result['error']}")
+        _print_error(result["error"])
         return
 
     print(ascii_art.achievements_list(result["unlocked"]))
-    print(f"\n  已解锁: {result['unlocked_count']}/{result['total']}")
+    print(i18n.t("cli.achievements_unlocked", unlocked=result["unlocked_count"], total=result["total"]))
 
     if result["locked"]:
-        print("\n  🔒 未解锁成就:")
-        for a in result["locked"]:
-            print(f"     • {a['name']} — {a['description']} (+{a['xp']} XP)")
+        print(f"\n  🔒 {i18n.t('cli.achievements_locked')}")
+        for item in result["locked"]:
+            print(f"     • {item['name']} - {item['description']} (+{item['xp']} XP)")
 
 
 def cmd_break_suggest():
     """推荐休息动作"""
     profile = data.load_profile()
     if not profile:
-        print("❌ 系统未初始化。请先运行 init。")
+        _print_error(i18n.t("core.not_initialized"))
         return
 
     print(f"\n{lore.random_exercise_intro()}")
@@ -138,45 +147,62 @@ def cmd_break_suggest():
     for ex in plan:
         print(ascii_art.exercise_card(ex))
 
-    print(f"\n完成后使用 'log <运动ID>' 记录训练")
+    print(f"\n{i18n.t('cli.break_log_hint')}")
     if plan:
-        print(f"例如: python3 scripts/cli.py log {plan[0]['id']}")
+        print(i18n.t("cli.plan_log_example", exercise_id=plan[0]["id"]))
 
 
 def cmd_posture_check():
     """体态检查"""
     profile = data.load_profile()
     if not profile:
-        print("❌ 系统未初始化。请先运行 init。")
+        _print_error(i18n.t("core.not_initialized"))
         return
 
     print(ascii_art.mini_banner())
     print(lore.random_posture_check())
-    print("\n完成校准后，保持正确坐姿继续编码。你的脊椎会感谢你的。")
+    print(f"\n{i18n.t('cli.posture_done')}")
+
+
+def cmd_lang(lang_code=None):
+    """切换语言"""
+    if not lang_code:
+        print(i18n.t("cli.lang_usage"))
+        print(i18n.t("cli.lang_current", code=i18n.get_lang()))
+        return
+
+    if lang_code not in i18n.SUPPORTED_LANGS:
+        _print_error(i18n.t("cli.lang_invalid", code=lang_code))
+        print(i18n.t("cli.lang_usage"))
+        return
+
+    i18n.set_lang(lang_code)
+    print(i18n.t("cli.lang_changed"))
+    print(i18n.t("cli.lang_current", code=i18n.get_lang()))
 
 
 def cmd_help():
     """帮助信息"""
     print(ascii_art.mini_banner())
-    print("""
-  可用命令:
-    init            初始化义体维护系统
-    status          查看仪表盘
-    check-session   检查是否需要休息
-    log <exercise>  记录训练 (使用运动ID或名称)
-    plan [level]    生成健身计划
-    achievements    查看成就
-    break-suggest   推荐休息运动
-    posture-check   体态检查
-    help            显示帮助
 
-  运动分类:
-    neural     神经接口校准 (颈部/眼部)
-    upper      上肢动力模块 (手腕/手臂/肩膀)
-    lower      液压腿部系统 (腿部)
-    core       核心稳定器 (腰腹)
-    cooldown   义体冷却程序 (拉伸放松)
-    """)
+    print(f"\n  {i18n.t('help.commands_header')}")
+    print(f"    init            {i18n.t('help.init')}")
+    print(f"    status          {i18n.t('help.status')}")
+    print(f"    check-session   {i18n.t('help.check_session')}")
+    print(f"    log <exercise>  {i18n.t('help.log')}")
+    print(f"    plan [level]    {i18n.t('help.plan')}")
+    print(f"    achievements    {i18n.t('help.achievements')}")
+    print(f"    break-suggest   {i18n.t('help.break_suggest')}")
+    print(f"    posture-check   {i18n.t('help.posture_check')}")
+    print(f"    lang <en|zh>    {i18n.t('help.lang')}")
+    print(f"    help            {i18n.t('help.help')}")
+
+    print(f"\n  {i18n.t('help.exercise_categories')}")
+    print(f"    neural     {i18n.t('help.cat_neural')}")
+    print(f"    upper      {i18n.t('help.cat_upper')}")
+    print(f"    lower      {i18n.t('help.cat_lower')}")
+    print(f"    core       {i18n.t('help.cat_core')}")
+    print(f"    cooldown   {i18n.t('help.cat_cooldown')}")
 
 
 def main():
@@ -196,6 +222,7 @@ def main():
         "achievements": cmd_achievements,
         "break-suggest": cmd_break_suggest,
         "posture-check": cmd_posture_check,
+        "lang": lambda: cmd_lang(args[0] if args else None),
         "help": cmd_help,
     }
 
@@ -203,7 +230,7 @@ def main():
     if handler:
         handler()
     else:
-        print(f"❌ 未知命令: {command}")
+        _print_error(i18n.t("cli.unknown_command", command=command))
         cmd_help()
 
 
