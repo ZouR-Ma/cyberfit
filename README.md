@@ -8,6 +8,8 @@
 [![Python 3](https://img.shields.io/badge/Python-3-blue.svg)](https://python.org)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blueviolet)](https://claude.ai/code)
 
+**[English](README_EN.md) | 中文**
+
 <br>
 
 你的同事把祖传屎山甩给你，然后跳槽涨薪 50% 了？<br>
@@ -122,6 +124,7 @@ python3 scripts/cli.py break-suggest   # 推荐运动（你现在就该用这个
 python3 scripts/cli.py log <exercise>  # 记录训练
 python3 scripts/cli.py plan [level]    # 生成健身计划
 python3 scripts/cli.py achievements    # 查看你的街头信誉
+python3 scripts/cli.py lang <en|zh>    # 切换语言
 python3 scripts/cli.py posture-check   # 体态扫描
 python3 scripts/cli.py check-session   # 检查你坐了多久了
 ```
@@ -243,7 +246,8 @@ cyberfit/
 ├── profile.json       # 你的义体档案
 ├── logs.json          # 训练日志
 ├── achievements.json  # 你的街头信誉
-└── sessions.json      # 会话记录
+├── sessions.json      # 会话记录
+└── config.json        # 语言偏好（en/zh）
 ```
 
 ---

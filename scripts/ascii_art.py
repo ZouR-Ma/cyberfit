@@ -1,10 +1,30 @@
 """
-CyberFit ASCII Art & 赛博朋克终端 UI
+CyberFit ASCII Art terminal UI.
 """
+
+from . import i18n, lore
+
+
+def _is_en() -> bool:
+    return i18n.get_lang() == "en"
 
 
 def banner():
     """CyberFit 主横幅"""
+    if _is_en():
+        return r"""
+╔══════════════════════════════════════════════════════════════╗
+║   ██████╗██╗   ██╗██████╗ ███████╗██████╗ ███████╗██╗████████╗  ║
+║  ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║╚══██╔══╝  ║
+║  ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝█████╗  ██║   ██║     ║
+║  ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██╔══╝  ██║   ██║     ║
+║  ╚██████╗   ██║   ██████╔╝███████╗██║  ██║██║     ██║   ██║     ║
+║   ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝     ║
+║                                                                  ║
+║         "Body is your core hardware, not replaceable"           ║
+║               Night City · Cybernetic Maintenance v1.0           ║
+╚══════════════════════════════════════════════════════════════╝
+"""
     return r"""
 ╔══════════════════════════════════════════════════════════════╗
 ║   ██████╗██╗   ██╗██████╗ ███████╗██████╗ ███████╗██╗████████╗  ║
@@ -22,6 +42,12 @@ def banner():
 
 def mini_banner():
     """小型横幅"""
+    if _is_en():
+        return """
+┌─────────────────────────────────────┐
+│  CYBERFIT // MAINTENANCE SYSTEM     │
+│  "Body is core hardware"            │
+└─────────────────────────────────────┘"""
     return """
 ┌─────────────────────────────────────┐
 │  CYBERFIT // 义体维护系统            │
@@ -50,12 +76,33 @@ def xp_bar(current_xp, next_level_xp, level):
 def dashboard(profile, today_count, streak, achievements_count):
     """生成赛博朋克仪表盘"""
     level = profile.get("level", 1)
-    title = profile.get("title", "流浪者")
+    title, _ = lore.get_rank_info(level)
     total_xp = profile.get("total_xp", 0)
     next_xp = level * 100
     stats = profile.get("stats", {})
     total_sessions = stats.get("total_sessions", 0)
     total_exercises = stats.get("total_exercises", 0)
+
+    if _is_en():
+        return f"""
+╔══════════════════════════════════════════════════╗
+║      CYBERFIT MAINTENANCE DASHBOARD             ║
+╠══════════════════════════════════════════════════╣
+║                                                  ║
+║  Operator: {profile.get('cyber_name', 'V'):<10}  Title: {title:<12} ║
+║  Cyber Level: LV.{level:<5}                          ║
+║                                                  ║
+║  XP:                                             ║
+║  {xp_bar(total_xp % next_xp, next_xp, level):<46} ║
+║                                                  ║
+╠══════════════════════════════════════════════════╣
+║  ▸ Workouts Today:    {today_count:<5}                     ║
+║  ▸ Streak Days:       {streak:<5}                     ║
+║  ▸ Total Workouts:    {total_exercises:<5}                     ║
+║  ▸ Achievements:      {achievements_count:<5}                     ║
+║  ▸ Total Sessions:    {total_sessions:<5}                     ║
+║                                                  ║
+╚══════════════════════════════════════════════════╝"""
 
     return f"""
 ╔══════════════════════════════════════════════════╗
@@ -82,7 +129,17 @@ def exercise_card(exercise):
     """运动卡片"""
     duration = exercise.get("duration_seconds", 0)
     reps = exercise.get("reps")
-    metric = f"{reps} 次" if reps else f"{duration} 秒"
+    if _is_en():
+        metric = f"{reps} reps" if reps else f"{duration} sec"
+        difficulty_label = "Difficulty"
+        metric_label = "Time/Reps"
+        instruction_label = "Instructions"
+    else:
+        metric = f"{reps} 次" if reps else f"{duration} 秒"
+        difficulty_label = "难度"
+        metric_label = "时长/次数"
+        instruction_label = "操作指令"
+
     diff_stars = "★" * exercise["difficulty"] + "☆" * (3 - exercise["difficulty"])
 
     return f"""
@@ -90,30 +147,48 @@ def exercise_card(exercise):
 │  🦾 {exercise['cyber_name']:<38} │
 │  ({exercise['real_name']})                            │
 ├─────────────────────────────────────────────┤
-│  难度: {diff_stars}   时长/次数: {metric:<10}       │
+│  {difficulty_label}: {diff_stars}   {metric_label}: {metric:<10}   │
 │                                             │
 │  {exercise['description']:<43} │
 │                                             │
-│  操作指令:                                   │
+│  {instruction_label}:                              │
 │  {exercise['instructions'].replace(chr(10), chr(10) + '│  '):<43} │
 └─────────────────────────────────────────────┘"""
 
 
 def achievement_card(achievement):
     """成就卡片"""
+    if _is_en():
+        title = "Achievement Unlocked"
+        time_label = "Unlocked"
+    else:
+        title = "成就解锁！"
+        time_label = "解锁时间"
+
     return f"""
 ╔═══════════════════════════════════════╗
-║  🏆 成就解锁！                         ║
+║  🏆 {title:<31}║
 ║                                       ║
 ║  {achievement['name']:<35} ║
 ║  {achievement['description']:<35} ║
 ║                                       ║
-║  解锁时间: {achievement.get('unlocked_at', 'N/A')[:10]:<24} ║
+║  {time_label}: {achievement.get('unlocked_at', 'N/A')[:10]:<26} ║
 ╚═══════════════════════════════════════╝"""
 
 
 def break_banner():
     """休息提醒横幅"""
+    if _is_en():
+        return """
+╔══════════════════════════════════════════════════╗
+║                                                  ║
+║   ⚠️  CYBERNETIC MAINTENANCE AI ALERT             ║
+║                                                  ║
+║   Physical-layer maintenance required            ║
+║   Pause data flow and run the protocol below     ║
+║                                                  ║
+╚══════════════════════════════════════════════════╝"""
+
     return """
 ╔══════════════════════════════════════════════════╗
 ║                                                  ║
@@ -127,6 +202,17 @@ def break_banner():
 
 def session_warning(minutes):
     """久坐警告"""
+    if _is_en():
+        return f"""
+┌──────────────────────────────────────────┐
+│  ⚠️ Sitting Alert                         │
+│                                          │
+│  Continuous coding time: {minutes} min       │
+│  Recommended maintenance: every 45 min   │
+│                                          │
+│  Run /cyberfit-break for protocol        │
+└──────────────────────────────────────────┘"""
+
     return f"""
 ┌──────────────────────────────────────────┐
 │  ⚠️ 久坐警告                              │
@@ -140,17 +226,29 @@ def session_warning(minutes):
 
 def plan_display(exercises, level, title):
     """健身计划展示"""
-    lines = [
-        "╔══════════════════════════════════════════════════╗",
-        "║          CYBERFIT 义体维护计划                     ║",
-        f"║  等级: LV.{level}  称号: {title:<20}           ║",
-        "╠══════════════════════════════════════════════════╣",
-    ]
-    for i, ex in enumerate(exercises, 1):
-        reps = ex.get("reps")
-        metric = f"{reps}次" if reps else f"{ex['duration_seconds']}秒"
-        line = f"║  {i}. {ex['cyber_name']:<20} ({ex['real_name']}) {metric:<8} ║"
-        lines.append(line)
+    if _is_en():
+        lines = [
+            "╔══════════════════════════════════════════════════╗",
+            "║          CYBERFIT MAINTENANCE PLAN              ║",
+            f"║  Level: LV.{level}  Title: {title:<22}   ║",
+            "╠══════════════════════════════════════════════════╣",
+        ]
+        for i, ex in enumerate(exercises, 1):
+            reps = ex.get("reps")
+            metric = f"{reps} reps" if reps else f"{ex['duration_seconds']} sec"
+            lines.append(f"║  {i}. {ex['cyber_name']:<20} ({ex['real_name']}) {metric:<8} ║")
+    else:
+        lines = [
+            "╔══════════════════════════════════════════════════╗",
+            "║          CYBERFIT 义体维护计划                     ║",
+            f"║  等级: LV.{level}  称号: {title:<20}           ║",
+            "╠══════════════════════════════════════════════════╣",
+        ]
+        for i, ex in enumerate(exercises, 1):
+            reps = ex.get("reps")
+            metric = f"{reps}次" if reps else f"{ex['duration_seconds']}秒"
+            lines.append(f"║  {i}. {ex['cyber_name']:<20} ({ex['real_name']}) {metric:<8} ║")
+
     lines.append("║                                                  ║")
     lines.append("╚══════════════════════════════════════════════════╝")
     return "\n".join(lines)
@@ -159,21 +257,40 @@ def plan_display(exercises, level, title):
 def achievements_list(achievements):
     """成就列表展示"""
     if not achievements:
+        if _is_en():
+            return """
+┌─────────────────────────────────────┐
+│  No unlocked achievements yet       │
+│  Start training to earn Street Cred │
+└─────────────────────────────────────┘"""
         return """
 ┌─────────────────────────────────────┐
 │  暂无解锁成就                        │
 │  开始训练以获取街头信誉！              │
 └─────────────────────────────────────┘"""
 
-    lines = [
-        "╔══════════════════════════════════════════════════╗",
-        "║          🏆 街头信誉 — 成就系统                    ║",
-        "╠══════════════════════════════════════════════════╣",
-    ]
-    for a in achievements:
-        lines.append(f"║  🏆 {a['name']:<40}   ║")
-        lines.append(f"║     {a['description']:<40}   ║")
-        lines.append(f"║     解锁: {a.get('unlocked_at', 'N/A')[:10]:<34}   ║")
-        lines.append("║                                                  ║")
+    if _is_en():
+        lines = [
+            "╔══════════════════════════════════════════════════╗",
+            "║          🏆 STREET CRED ACHIEVEMENTS            ║",
+            "╠══════════════════════════════════════════════════╣",
+        ]
+        for a in achievements:
+            lines.append(f"║  🏆 {a['name']:<40}   ║")
+            lines.append(f"║     {a['description']:<40}   ║")
+            lines.append(f"║     Unlocked: {a.get('unlocked_at', 'N/A')[:10]:<29}   ║")
+            lines.append("║                                                  ║")
+    else:
+        lines = [
+            "╔══════════════════════════════════════════════════╗",
+            "║          🏆 街头信誉 — 成就系统                    ║",
+            "╠══════════════════════════════════════════════════╣",
+        ]
+        for a in achievements:
+            lines.append(f"║  🏆 {a['name']:<40}   ║")
+            lines.append(f"║     {a['description']:<40}   ║")
+            lines.append(f"║     解锁: {a.get('unlocked_at', 'N/A')[:10]:<34}   ║")
+            lines.append("║                                                  ║")
+
     lines.append("╚══════════════════════════════════════════════════╝")
     return "\n".join(lines)

@@ -1,122 +1,233 @@
 """
-CyberFit 成就/称号系统
+CyberFit achievement and title system.
 """
 
-from . import data, lore
+from . import data, lore, i18n
 
-# 成就定义
-ACHIEVEMENT_DEFS = [
-    # 连续打卡
+
+ACHIEVEMENT_DEFS_ZH = [
     {
         "id": "streak_3",
         "name": "系统启动",
         "description": "连续 3 天完成训练",
         "condition": lambda profile, logs: data.get_streak() >= 3,
-        "xp": 50
+        "xp": 50,
     },
     {
         "id": "streak_7",
         "name": "稳定运行",
         "description": "连续 7 天完成训练",
         "condition": lambda profile, logs: data.get_streak() >= 7,
-        "xp": 150
+        "xp": 150,
     },
     {
         "id": "streak_14",
         "name": "钢铁意志协议",
         "description": "连续 14 天完成训练",
         "condition": lambda profile, logs: data.get_streak() >= 14,
-        "xp": 300
+        "xp": 300,
     },
     {
         "id": "streak_30",
         "name": "不灭传奇",
         "description": "连续 30 天完成训练",
         "condition": lambda profile, logs: data.get_streak() >= 30,
-        "xp": 1000
+        "xp": 1000,
     },
-    # 累计训练次数
     {
         "id": "total_10",
         "name": "初次改装",
         "description": "累计完成 10 次训练",
         "condition": lambda profile, logs: len(logs) >= 10,
-        "xp": 30
+        "xp": 30,
     },
     {
         "id": "total_50",
         "name": "银手之路",
         "description": "累计完成 50 次训练",
         "condition": lambda profile, logs: len(logs) >= 50,
-        "xp": 100
+        "xp": 100,
     },
     {
         "id": "total_100",
         "name": "百战老兵",
         "description": "累计完成 100 次训练",
         "condition": lambda profile, logs: len(logs) >= 100,
-        "xp": 300
+        "xp": 300,
     },
     {
         "id": "total_500",
         "name": "赛博之神",
         "description": "累计完成 500 次训练",
         "condition": lambda profile, logs: len(logs) >= 500,
-        "xp": 1000
+        "xp": 1000,
     },
-    # 分类达成
     {
         "id": "cat_neural",
         "name": "神经先知",
         "description": "完成 10 次神经接口校准训练",
         "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "neural") >= 10,
-        "xp": 80
+        "xp": 80,
     },
     {
         "id": "cat_upper",
         "name": "大力神臂",
         "description": "完成 10 次上肢动力模块训练",
         "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "upper") >= 10,
-        "xp": 80
+        "xp": 80,
     },
     {
         "id": "cat_lower",
         "name": "弹跳大师",
         "description": "完成 10 次液压腿部系统训练",
         "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "lower") >= 10,
-        "xp": 80
+        "xp": 80,
     },
     {
         "id": "cat_core",
         "name": "铁壁堡垒",
         "description": "完成 10 次核心稳定器训练",
         "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "core") >= 10,
-        "xp": 80
+        "xp": 80,
     },
     {
         "id": "cat_cooldown",
         "name": "冰霜行者",
         "description": "完成 10 次义体冷却程序",
         "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "cooldown") >= 10,
-        "xp": 80
+        "xp": 80,
     },
-    # 全分类
     {
         "id": "all_categories",
         "name": "全面改造",
         "description": "在所有 5 个分类中各完成至少 1 次训练",
         "condition": lambda profile, logs: len(set(l.get("category") for l in logs)) >= 5,
-        "xp": 200
+        "xp": 200,
     },
-    # 首次运动
     {
         "id": "first_exercise",
         "name": "觉醒",
         "description": "完成第一次训练",
         "condition": lambda profile, logs: len(logs) >= 1,
-        "xp": 10
+        "xp": 10,
     },
 ]
+
+ACHIEVEMENT_DEFS_EN = [
+    {
+        "id": "streak_3",
+        "name": "Boot Sequence",
+        "description": "Complete workouts for 3 consecutive days",
+        "condition": lambda profile, logs: data.get_streak() >= 3,
+        "xp": 50,
+    },
+    {
+        "id": "streak_7",
+        "name": "Stable Runtime",
+        "description": "Complete workouts for 7 consecutive days",
+        "condition": lambda profile, logs: data.get_streak() >= 7,
+        "xp": 150,
+    },
+    {
+        "id": "streak_14",
+        "name": "Iron Will Protocol",
+        "description": "Complete workouts for 14 consecutive days",
+        "condition": lambda profile, logs: data.get_streak() >= 14,
+        "xp": 300,
+    },
+    {
+        "id": "streak_30",
+        "name": "Unbreakable Legend",
+        "description": "Complete workouts for 30 consecutive days",
+        "condition": lambda profile, logs: data.get_streak() >= 30,
+        "xp": 1000,
+    },
+    {
+        "id": "total_10",
+        "name": "First Retrofit",
+        "description": "Complete 10 total workouts",
+        "condition": lambda profile, logs: len(logs) >= 10,
+        "xp": 30,
+    },
+    {
+        "id": "total_50",
+        "name": "Silverhand Route",
+        "description": "Complete 50 total workouts",
+        "condition": lambda profile, logs: len(logs) >= 50,
+        "xp": 100,
+    },
+    {
+        "id": "total_100",
+        "name": "Centurion Veteran",
+        "description": "Complete 100 total workouts",
+        "condition": lambda profile, logs: len(logs) >= 100,
+        "xp": 300,
+    },
+    {
+        "id": "total_500",
+        "name": "Cyber Deity",
+        "description": "Complete 500 total workouts",
+        "condition": lambda profile, logs: len(logs) >= 500,
+        "xp": 1000,
+    },
+    {
+        "id": "cat_neural",
+        "name": "Neural Oracle",
+        "description": "Complete 10 Neural Interface Calibration workouts",
+        "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "neural") >= 10,
+        "xp": 80,
+    },
+    {
+        "id": "cat_upper",
+        "name": "Titan Arms",
+        "description": "Complete 10 Upper Limb Power Module workouts",
+        "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "upper") >= 10,
+        "xp": 80,
+    },
+    {
+        "id": "cat_lower",
+        "name": "Jump Master",
+        "description": "Complete 10 Hydraulic Leg System workouts",
+        "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "lower") >= 10,
+        "xp": 80,
+    },
+    {
+        "id": "cat_core",
+        "name": "Iron Bastion",
+        "description": "Complete 10 Core Stabilizer workouts",
+        "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "core") >= 10,
+        "xp": 80,
+    },
+    {
+        "id": "cat_cooldown",
+        "name": "Frostwalker",
+        "description": "Complete 10 Cooling Protocol sessions",
+        "condition": lambda profile, logs: sum(1 for l in logs if l.get("category") == "cooldown") >= 10,
+        "xp": 80,
+    },
+    {
+        "id": "all_categories",
+        "name": "Full Retrofit",
+        "description": "Complete at least one workout in all 5 categories",
+        "condition": lambda profile, logs: len(set(l.get("category") for l in logs)) >= 5,
+        "xp": 200,
+    },
+    {
+        "id": "first_exercise",
+        "name": "Awakening",
+        "description": "Complete your first workout",
+        "condition": lambda profile, logs: len(logs) >= 1,
+        "xp": 10,
+    },
+]
+
+
+def _resolve_lang(lang=None):
+    return i18n.normalize_lang(lang or i18n.get_lang())
+
+
+def _get_defs(lang=None):
+    return ACHIEVEMENT_DEFS_EN if _resolve_lang(lang) == "en" else ACHIEVEMENT_DEFS_ZH
 
 
 # 等级经验阈值
@@ -146,14 +257,14 @@ def check_achievements(profile, logs):
     unlocked_ids = {a["id"] for a in unlocked}
     newly_unlocked = []
 
-    for ach_def in ACHIEVEMENT_DEFS:
+    for ach_def in _get_defs():
         if ach_def["id"] not in unlocked_ids:
             try:
                 if ach_def["condition"](profile, logs):
                     entry = data.unlock_achievement(
                         ach_def["id"],
                         ach_def["name"],
-                        ach_def["description"]
+                        ach_def["description"],
                     )
                     if entry:
                         entry["xp"] = ach_def["xp"]
@@ -164,6 +275,9 @@ def check_achievements(profile, logs):
     return newly_unlocked
 
 
-def get_all_achievement_defs():
+def get_all_achievement_defs(lang=None):
     """获取所有成就定义（用于展示）"""
-    return [{"id": a["id"], "name": a["name"], "description": a["description"], "xp": a["xp"]} for a in ACHIEVEMENT_DEFS]
+    return [
+        {"id": a["id"], "name": a["name"], "description": a["description"], "xp": a["xp"]}
+        for a in _get_defs(lang)
+    ]
