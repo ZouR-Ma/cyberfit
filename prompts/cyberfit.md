@@ -19,13 +19,7 @@ CyberFit 赛博朋克健身插件主命令。
 
 ## 执行
 
-当用户输入 `/cyberfit` 时，使用 `cyberfit-status` 技能展示仪表盘。如果系统未初始化，先执行：
-
-```bash
-python3 scripts/cli.py init
-```
-
-然后执行：
+当用户输入 `/cyberfit` 时，使用 `cyberfit-status` 技能展示仪表盘。执行：
 
 ```bash
 python3 scripts/cli.py status

@@ -34,9 +34,6 @@ def cmd_init():
 def cmd_status():
     """输出仪表盘"""
     result = core.get_status()
-    if result["status"] == "offline":
-        print(result["message"])
-        return
 
     print(
         ascii_art.dashboard(
@@ -53,10 +50,6 @@ def cmd_status():
 def cmd_check_session():
     """检查是否需要休息"""
     result = core.check_session()
-    if not result.get("initialized"):
-        print(ascii_art.mini_banner())
-        print(result["message"])
-        return
 
     if result["needs_break"]:
         print(ascii_art.break_banner())
@@ -98,10 +91,8 @@ def cmd_log(exercise_query):
 
 def cmd_plan(level_arg=None):
     """生成健身计划"""
+    data.ensure_initialized()
     profile = data.load_profile()
-    if not profile:
-        _print_error(i18n.t("core.not_initialized"))
-        return
 
     level = int(level_arg) if level_arg else profile.get("level", 1)
     title = achievements.get_title_for_level(level)
@@ -137,10 +128,7 @@ def cmd_achievements():
 
 def cmd_break_suggest():
     """推荐休息动作"""
-    profile = data.load_profile()
-    if not profile:
-        _print_error(i18n.t("core.not_initialized"))
-        return
+    data.ensure_initialized()
 
     print(f"\n{lore.random_exercise_intro()}")
     plan = planner.generate_quick_break()
@@ -154,10 +142,7 @@ def cmd_break_suggest():
 
 def cmd_posture_check():
     """体态检查"""
-    profile = data.load_profile()
-    if not profile:
-        _print_error(i18n.t("core.not_initialized"))
-        return
+    data.ensure_initialized()
 
     print(ascii_art.mini_banner())
     print(lore.random_posture_check())
