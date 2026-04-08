@@ -161,8 +161,8 @@ Biological hardware overheat risk +15%.
 Initiate cooling protocol.
 
 ┌─────────────────────────────────────────────┐
-│  🦾 Optical Implant Reset                    │
-│  (Eye Relaxation Drill)                      │
+│  🦾 Optical Implant Reset                   │
+│  (Eye Relaxation Drill)                     │
 ├─────────────────────────────────────────────┤
 │  Difficulty: ★☆☆   Time/Reps: 30 sec        │
 │                                             │
@@ -174,13 +174,22 @@ Initiate cooling protocol.
 > After workout completion:
 
 ```text
-✅ Maintenance complete. System performance restored.
+✅ Workout log saved.
 
+  Action: Optical Implant Reset (Eye Relaxation Drill)
   XP Earned: +15 XP
+  Total XP: 15 XP
   Level: LV.1 - Nomad
   Streak: 1 day
 
-🏆 Achievement unlocked: "Awakening"
+╔═══════════════════════════════════════╗
+║  🏆 Achievement Unlocked              ║
+║                                       ║
+║  Awakening                            ║
+║  Complete your first workout          ║
+║                                       ║
+║  Unlocked: 2026-04-08                 ║
+╚═══════════════════════════════════════╝
 ```
 
 ---
