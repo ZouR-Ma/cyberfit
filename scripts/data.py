@@ -84,6 +84,12 @@ def init_profile():
     return False
 
 
+def ensure_initialized():
+    """确保用户数据已初始化，若不存在则自动创建"""
+    if not PROFILE_FILE.exists():
+        init_profile()
+
+
 # === 训练日志 ===
 
 def load_logs():

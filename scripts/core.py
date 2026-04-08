@@ -27,9 +27,8 @@ def init_user():
 
 def get_status():
     """获取当前状态"""
+    data.ensure_initialized()
     profile = data.load_profile()
-    if not profile:
-        return {"status": "offline", "message": lore.get_status_description("offline")}
 
     logs = data.load_logs()
     today_logs = data.get_today_logs()
@@ -65,13 +64,8 @@ def get_status():
 
 def check_session():
     """检查是否需要休息提醒"""
+    data.ensure_initialized()
     profile = data.load_profile()
-    if not profile:
-        return {
-            "needs_break": False,
-            "message": i18n.t("core.not_initialized"),
-            "initialized": False
-        }
 
     # 记录会话开始
     data.record_session_start()
@@ -87,35 +81,30 @@ def check_session():
             "needs_break": True,
             "message": lore.random_break_reminder(),
             "reason": i18n.t("core.today_no_maintenance"),
-            "initialized": True
         }
 
     # 检查最后一次运动时间
-    if today_logs:
-        last_log_time = datetime.fromisoformat(today_logs[-1]["timestamp"])
-        minutes_since = (datetime.now() - last_log_time).total_seconds() / 60
-        if minutes_since > break_interval:
-            return {
-                "needs_break": True,
-                "message": lore.random_break_reminder(),
-                "reason": i18n.t("core.minutes_since_maintenance", minutes=int(minutes_since)),
-                "minutes_since": int(minutes_since),
-                "initialized": True
-            }
+    last_log_time = datetime.fromisoformat(today_logs[-1]["timestamp"])
+    minutes_since = (datetime.now() - last_log_time).total_seconds() / 60
+    if minutes_since > break_interval:
+        return {
+            "needs_break": True,
+            "message": lore.random_break_reminder(),
+            "reason": i18n.t("core.minutes_since_maintenance", minutes=int(minutes_since)),
+            "minutes_since": int(minutes_since),
+        }
 
     return {
         "needs_break": False,
         "message": i18n.t("core.system_normal"),
         "today_count": len(today_logs),
-        "initialized": True
     }
 
 
 def log_exercise(exercise_query):
     """记录一次训练"""
+    data.ensure_initialized()
     profile = data.load_profile()
-    if not profile:
-        return {"error": i18n.t("core.not_initialized")}
 
     exercise = exercises.find_exercise(exercise_query)
     if not exercise:
@@ -178,9 +167,8 @@ def log_exercise(exercise_query):
 
 def get_achievements_display():
     """获取成就展示数据"""
+    data.ensure_initialized()
     profile = data.load_profile()
-    if not profile:
-        return {"error": i18n.t("core.achievements_not_initialized")}
 
     unlocked = data.load_achievements()
     all_defs = achievements.get_all_achievement_defs()
